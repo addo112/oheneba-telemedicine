@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oheneba Center Telemedicine</title>
+    <meta name="description" content="Premium telemedicine platform for Oheneba Center in Accra. Book consultations and connect with expert healthcare providers globally.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="./styles/main.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="brand-logo">
+                <i class="fa-solid fa-heart-pulse"></i>
+                Oheneba<span>Center</span>
+            </a>
+            <div class="nav-links">
+                <a href="#services">Services</a>
+                <a href="#payments">Payments</a>
+                <a href="#doctors">Specialists</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-outline" id="loginBtn">Log In</a>
+                <a href="dashboard.html" class="btn btn-primary" id="bookBtn">Dashboard</a>
+            </div>
+            <div class="mobile-menu-toggle">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-content">
+            <span class="badge">Premium Healthcare, Anywhere</span>
+            <h1>Expert Medical Care at Your Fingertips.</h1>
+            <p>Connect with top specialists from the Oheneba Center in Accra. Secure, real-time video consultations, prescription management, and easy payments globally and locally.</p>
+            
+            <div class="hero-cta">
+                <a href="dashboard.html" class="btn btn-primary btn-large">Start Consultation <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="#services" class="btn btn-secondary btn-large"><i class="fa-solid fa-play"></i> Explore Services</a>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-item">
+                    <h3>24/7</h3>
+                    <p>Availability</p>
+                </div>
+                <div class="stat-item">
+                    <h3>50+</h3>
+                    <p>Specialists</p>
+                </div>
+                <div class="stat-item">
+                    <h3>10k+</h3>
+                    <p>Happy Patients</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            <div class="glass-card main-card">
+                <div class="card-header">
+                    <div class="doctor-info">
+                        <div class="avatar doctor-avatar"></div>
+                        <div>
+                            <h4>Dr. Sarah Mensah</h4>
+                            <p>Cardiologist</p>
+                        </div>
+                    </div>
+                    <div class="status online">Online</div>
+                </div>
+                <div class="card-body">
+                    <div class="video-placeholder">
+                        <i class="fa-solid fa-video"></i>
+                        <span>Connecting to secure room...</span>
+                    </div>
+                </div>
+                <div class="card-controls">
+                    <button class="control-btn"><i class="fa-solid fa-microphone"></i></button>
+                    <button class="control-btn end-call"><i class="fa-solid fa-phone-slash"></i></button>
+                    <button class="control-btn"><i class="fa-solid fa-video"></i></button>
+                </div>
+            </div>
+            
+            <div class="glass-card floating-badge badge-1">
+                <i class="fa-solid fa-shield-halved"></i> 100% Secure & Private
+            </div>
+            <div class="glass-card floating-badge badge-2">
+                <i class="fa-solid fa-credit-card"></i> Card & MoMo Accepted
+            </div>
+        </div>
+        
+        <!-- Decorative Background Elements -->
+        <div class="bg-blob blob-1"></div>
+        <div class="bg-blob blob-2"></div>
+    </header>
+
+    <!-- Services Section -->
+    <section id="services" class="services-section">
+        <div class="section-header text-center">
+            <h2>Comprehensive Virtual Care</h2>
+            <p>Everything you need for your health, managed in one premium platform.</p>
+        </div>
+        
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon"><i class="fa-solid fa-stethoscope"></i></div>
+                <h3>General Consultations</h3>
+                <p>Speak with general practitioners for everyday health concerns and advice.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fa-solid fa-brain"></i></div>
+                <h3>Mental Health</h3>
+                <p>Confidential therapy and psychiatric support from certified professionals.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fa-solid fa-prescription-bottle-medical"></i></div>
+                <h3>Prescription Refills</h3>
+                <p>Get your prescriptions renewed and sent directly to a partner pharmacy.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fa-solid fa-user-doctor"></i></div>
+                <h3>Specialist Referrals</h3>
+                <p>Access our network of top specialists in cardiology, dermatology, and more.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Payment Section -->
+    <section id="payments" class="payment-section">
+        <div class="payment-content">
+            <h2>Seamless Payments for Everyone</h2>
+            <p>Whether you're in Ghana or abroad, our flexible payment gateway powered by Paystack ensures smooth and secure transactions.</p>
+            
+            <ul class="payment-features">
+                <li><i class="fa-solid fa-check-circle"></i> Mobile Money (MTN, Vodafone, AirtelTigo)</li>
+                <li><i class="fa-solid fa-check-circle"></i> International Credit & Debit Cards</li>
+                <li><i class="fa-solid fa-check-circle"></i> Apple Pay & Google Pay Supported</li>
+                <li><i class="fa-solid fa-check-circle"></i> End-to-end Encryption</li>
+            </ul>
+        </div>
+        <div class="payment-visual">
+            <div class="glass-card payment-card">
+                <div class="payment-header">
+                    <h4>Checkout</h4>
+                    <span>GHS 250.00</span>
+                </div>
+                <div class="payment-methods">
+                    <button class="method-btn active"><i class="fa-solid fa-mobile-screen"></i> MoMo</button>
+                    <button class="method-btn"><i class="fa-solid fa-credit-card"></i> Card</button>
+                </div>
+                <div class="mock-input">024 XXX XXXX</div>
+                <button id="payBtn" class="btn btn-primary w-100 mt-3">Pay Now</button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Specialists Section -->
+    <section id="doctors" class="services-section" style="background: white;">
+        <div class="section-header text-center">
+            <h2>Our Top Specialists</h2>
+            <p>Connect with the best healthcare professionals globally.</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card text-center">
+                <div class="doctor-avatar" style="margin: 0 auto 1rem; width: 80px; height: 80px;"></div>
+                <h3>Dr. Sarah Mensah</h3>
+                <p>Cardiology</p>
+            </div>
+            <div class="service-card text-center">
+                <div class="doctor-avatar" style="margin: 0 auto 1rem; width: 80px; height: 80px; background-image: url('https://i.pravatar.cc/150?img=11');"></div>
+                <h3>Dr. Kwame Osei</h3>
+                <p>General Medicine</p>
+            </div>
+            <div class="service-card text-center">
+                <div class="doctor-avatar" style="margin: 0 auto 1rem; width: 80px; height: 80px; background-image: url('https://i.pravatar.cc/150?img=47');"></div>
+                <h3>Dr. Ama Serwaa</h3>
+                <p>Psychiatry</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="#" class="brand-logo">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                    Oheneba<span>Center</span>
+                </a>
+                <p>Elevating healthcare accessibility for Ghanaians and the world through premium telemedicine.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Platform</h4>
+                <a href="#">Patient Portal</a>
+                <a href="#">Doctor Login</a>
+                <a href="#">Pricing</a>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">HIPAA Compliance</a>
+            </div>
+            <div class="footer-links">
+                <h4>Contact</h4>
+                <p>Accra, Ghana</p>
+                <p>support@ohenebacenter.com</p>
+                <p>+233 (0) 30 200 0000</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Oheneba Center. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- App Scripts -->
+    <script src="./js/app.js"></script>
+</body>
+</html>
