@@ -290,43 +290,92 @@
                 </div>
             </header>
             
-            <div class="dashboard-grid">
-                <!-- Left Column -->
-                <div>
-                    <div class="panel mb-4">
-                        <div class="panel-header">
-                            <h3>Upcoming Appointments</h3>
-                            <a href="#" style="color: var(--secondary); font-size: 0.9rem; font-weight: 500;">View All</a>
+            <div id="panel-Overview" class="dashboard-panel active-panel">
+                <div class="dashboard-grid">
+                    <!-- Left Column -->
+                    <div>
+                        <div class="panel mb-4">
+                            <div class="panel-header">
+                                <h3>Upcoming Appointments</h3>
+                                <a href="#" style="color: var(--secondary); font-size: 0.9rem; font-weight: 500;">View All</a>
+                            </div>
+                            <div id="appointmentsList">
+                                <!-- Dynamically loaded appointments will appear here -->
+                            </div>
                         </div>
-                        <div id="appointmentsList">
-                            <!-- Dynamically loaded appointments will appear here -->
+                    </div>
+                    
+                    <!-- Right Column -->
+                    <div>
+                        <div class="panel">
+                            <div class="panel-header">
+                                <h3>Quick Actions</h3>
+                            </div>
+                            <div class="action-list">
+                                <div class="action-btn">
+                                    <i class="fa-solid fa-plus-circle"></i>
+                                    <span>Book New Appointment</span>
+                                </div>
+                                <div class="action-btn">
+                                    <i class="fa-solid fa-prescription-bottle-medical"></i>
+                                    <span>Request Prescription Refill</span>
+                                </div>
+                                <div class="action-btn">
+                                    <i class="fa-solid fa-comment-medical"></i>
+                                    <span>Message Your Doctor</span>
+                                </div>
+                                <div class="action-btn">
+                                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                                    <span>Make a Payment (MoMo/Card)</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Right Column -->
-                <div>
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h3>Quick Actions</h3>
-                        </div>
-                        <div class="action-list">
-                            <div class="action-btn">
-                                <i class="fa-solid fa-plus-circle"></i>
-                                <span>Book New Appointment</span>
-                            </div>
-                            <div class="action-btn">
-                                <i class="fa-solid fa-prescription-bottle-medical"></i>
-                                <span>Request Prescription Refill</span>
-                            </div>
-                            <div class="action-btn">
-                                <i class="fa-solid fa-comment-medical"></i>
-                                <span>Message Your Doctor</span>
-                            </div>
-                            <div class="action-btn">
-                                <i class="fa-solid fa-file-invoice-dollar"></i>
-                                <span>Make a Payment (MoMo/Card)</span>
-                            </div>
+            </div>
+
+            <!-- Other Panels (Hidden by default) -->
+            <div id="panel-Appointments" class="dashboard-panel" style="display:none;">
+                <div class="panel">
+                    <h2>Your Appointments</h2>
+                    <p class="text-muted">Manage your upcoming and past appointments here.</p>
+                    <div style="margin-top: 2rem; padding: 3rem; text-align: center; background: #F8FAFC; border-radius: 8px;">
+                        <i class="fa-solid fa-calendar-check" style="font-size: 3rem; color: #CBD5E1; margin-bottom: 1rem;"></i>
+                        <p>No past appointments found.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="panel-Medical Records" class="dashboard-panel" style="display:none;">
+                <div class="panel">
+                    <h2>Medical Records</h2>
+                    <p class="text-muted">Access your lab results, prescriptions, and visit summaries.</p>
+                    <div style="margin-top: 2rem; padding: 3rem; text-align: center; background: #F8FAFC; border-radius: 8px;">
+                        <i class="fa-solid fa-file-medical" style="font-size: 3rem; color: #CBD5E1; margin-bottom: 1rem;"></i>
+                        <p>Your medical records are up to date.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="panel-Payments" class="dashboard-panel" style="display:none;">
+                <div class="panel">
+                    <h2>Billing & Payments</h2>
+                    <p class="text-muted">View your invoices and make payments.</p>
+                    <div style="margin-top: 2rem; padding: 3rem; text-align: center; background: #F8FAFC; border-radius: 8px;">
+                        <i class="fa-solid fa-file-invoice-dollar" style="font-size: 3rem; color: #CBD5E1; margin-bottom: 1rem;"></i>
+                        <p>You have no pending invoices.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="panel-Settings" class="dashboard-panel" style="display:none;">
+                <div class="panel">
+                    <h2>Account Settings</h2>
+                    <p class="text-muted">Update your profile, password, and notifications.</p>
+                    <div style="margin-top: 2rem;">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" value="John Doe" disabled style="background: #F1F5F9;">
                         </div>
                     </div>
                 </div>

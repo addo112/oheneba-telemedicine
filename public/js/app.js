@@ -94,16 +94,31 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Sidebar interaction demo
     const sidebarItems = document.querySelectorAll('.sidebar-item');
+    const allPanels = document.querySelectorAll('.dashboard-panel');
+    
     if (sidebarItems.length > 0) {
         sidebarItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 if(item.innerText.includes('Log Out')) return; // let href handle it
                 e.preventDefault();
+                
+                // Update active sidebar style
                 sidebarItems.forEach(i => i.classList.remove('active'));
                 item.classList.add('active');
                 
+                // Switch panel
                 const moduleName = item.innerText.trim();
-                alert(`Opening ${moduleName} module...`);
+                if (allPanels.length > 0) {
+                    allPanels.forEach(panel => panel.style.display = 'none');
+                    const targetPanel = document.getElementById(`panel-${moduleName}`);
+                    if (targetPanel) {
+                        targetPanel.style.display = 'block';
+                    } else {
+                        // Fallback to overview if not found
+                        const overview = document.getElementById('panel-Overview');
+                        if(overview) overview.style.display = 'block';
+                    }
+                }
             });
         });
     }
