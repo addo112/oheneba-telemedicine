@@ -108,14 +108,66 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Action buttons interaction demo
+    // Action buttons interaction demo & Modal logic
     const actionBtns = document.querySelectorAll('.action-btn');
+    const bookingModal = document.getElementById('bookingModal');
+    const closeBookingModal = document.getElementById('closeBookingModal');
+    const bookingForm = document.getElementById('bookingForm');
+
     if (actionBtns.length > 0) {
         actionBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const actionName = btn.querySelector('span').innerText;
-                alert(`Action Triggered: ${actionName}`);
+                
+                if (actionName === 'Book New Appointment') {
+                    if(bookingModal) bookingModal.classList.add('show');
+                } else {
+                    alert(`Module in progress: ${actionName}`);
+                }
             });
+        });
+    }
+
+    if (closeBookingModal) {
+        closeBookingModal.addEventListener('click', () => {
+            bookingModal.classList.remove('show');
+        });
+    }
+
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBookingBtn');
+            submitBtn.innerText = 'Booking...';
+            
+            const doctor = document.getElementById('docSelect').value;
+            const type = document.getElementById('typeSelect').value;
+            const date = document.getElementById('dateInput').value;
+            const time = document.getElementById('timeInput').value;
+            
+            try {
+                const res = await fetch('/api/appointments/book', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ doctor, type, date, time })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    alert("Appointment booked successfully!");
+                    bookingModal.classList.remove('show');
+                    bookingForm.reset();
+                    loadAppointments(); // Reload list
+                } else {
+                    alert("Failed to book appointment.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error connecting to server.");
+            } finally {
+                submitBtn.innerText = 'Confirm Booking';
+            }
         });
     }
 });

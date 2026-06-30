@@ -192,6 +192,51 @@
             box-shadow: 0 4px 12px rgba(0, 210, 255, 0.1);
         }
         
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius-md);
+            width: 90%;
+            max-width: 500px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #E2E8F0;
+            border-radius: var(--border-radius-sm);
+        }
     </style>
 </head>
 <body>
@@ -287,6 +332,42 @@
                 </div>
             </div>
         </main>
+    </div>
+    
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Book New Appointment</h2>
+                <i class="fa-solid fa-times close-modal" id="closeBookingModal"></i>
+            </div>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label>Select Specialist</label>
+                    <select id="docSelect" required>
+                        <option value="Dr. Sarah Mensah">Dr. Sarah Mensah (Cardiology)</option>
+                        <option value="Dr. Kwame Osei">Dr. Kwame Osei (General Medicine)</option>
+                        <option value="Dr. Ama Serwaa">Dr. Ama Serwaa (Psychiatry)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Consultation Type</label>
+                    <select id="typeSelect" required>
+                        <option value="Video Call">Video Call</option>
+                        <option value="In-Person">In-Person</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="dateInput" required>
+                </div>
+                <div class="form-group">
+                    <label>Time</label>
+                    <input type="time" id="timeInput" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-3" id="submitBookingBtn">Confirm Booking</button>
+            </form>
+        </div>
     </div>
     
     <!-- Socket.io and App Scripts -->
