@@ -398,7 +398,7 @@ async function loadAppointments() {
                         </div>
                     </div>
                     ${apt.type === 'Video Call' ? 
-                        `<button class="btn btn-primary" onclick="joinVideoCall()"><i class="fa-solid fa-video"></i> Join</button>` : 
+                        `<button class="btn btn-primary" onclick="joinVideoCall('${apt._id}', 'patient')"><i class="fa-solid fa-video"></i> Join</button>` : 
                         `<button class="btn btn-outline">Details</button>`}
                 </div>
                 `;
@@ -406,26 +406,5 @@ async function loadAppointments() {
         }
     } catch (error) {
         console.error("Error fetching appointments:", error);
-    }
-}
-
-// Socket.io + WebRTC logic for Video Calling
-async function joinVideoCall() {
-    const videoStatus = document.querySelector('.video-placeholder span');
-    if (videoStatus) videoStatus.innerText = 'Requesting Camera...';
-    
-    alert("In a real environment, this would request your camera and connect to the doctor via Socket.io & WebRTC!");
-    
-    // Check if io is defined (needs script tag in html)
-    if (typeof io !== 'undefined') {
-        socket = io('/');
-        
-        const userId = 'patient-' + Math.floor(Math.random() * 1000);
-        socket.emit('join-room', roomId, userId);
-        
-        socket.on('user-connected', (id) => {
-            console.log('User connected: ' + id);
-            // In a real app, we would initiate WebRTC offer here
-        });
     }
 }

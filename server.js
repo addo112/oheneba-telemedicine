@@ -274,16 +274,20 @@ io.on('connection', (socket) => {
         // Notify others in the room
         socket.to(roomId).emit('user-connected', userId);
 
-        socket.on('offer', (offer, userId) => {
-            socket.to(roomId).emit('offer', offer, userId);
+        socket.on('offer', (offer) => {
+            socket.to(roomId).emit('offer', offer);
         });
 
-        socket.on('answer', (answer, userId) => {
-            socket.to(roomId).emit('answer', answer, userId);
+        socket.on('answer', (answer) => {
+            socket.to(roomId).emit('answer', answer);
         });
 
-        socket.on('ice-candidate', (candidate, userId) => {
-            socket.to(roomId).emit('ice-candidate', candidate, userId);
+        socket.on('ice-candidate', (candidate) => {
+            socket.to(roomId).emit('ice-candidate', candidate);
+        });
+
+        socket.on('disconnect-room', () => {
+            socket.to(roomId).emit('user-disconnected', userId);
         });
 
         socket.on('disconnect', () => {
