@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Portal - Soul Health & Wellness Centre</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #F1F5F9; }
+        .dashboard-layout { min-height: 100vh; background: #F1F5F9; }
+        .sidebar {
+            background: #0A2540; /* Doctor sidebar uses primary color */
+            border-right: 1px solid #E2E8F0;
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            width: 260px;
+            color: white;
+        }
+        .brand-logo-doc {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .sidebar-menu { margin-top: 3rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .sidebar-item {
+            padding: 12px 16px;
+            border-radius: var(--border-radius-sm);
+            color: rgba(255,255,255,0.7);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .sidebar-item:hover, .sidebar-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .sidebar-item i { font-size: 1.1rem; width: 20px; text-align: center; }
+        
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem 3rem;
+        }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .topbar h1 { margin: 0; line-height: 1.2; color: var(--primary); }
+        .user-profile { display: flex; align-items: center; gap: 12px; }
+        .user-avatar {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            background: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .panel {
+            background: white;
+            border-radius: var(--border-radius-md);
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.04);
+            margin-bottom: 2rem;
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-bottom: 1px solid #E2E8F0;
+            padding-bottom: 1rem;
+        }
+        .panel-header h3 { color: var(--primary); font-size: 1.3rem; margin: 0; }
+        
+        /* Table Styles */
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td {
+            padding: 1rem; text-align: left; border-bottom: 1px solid #E2E8F0;
+        }
+        .data-table th { font-weight: 600; color: var(--text-muted); font-size: 0.9rem; }
+        .data-table tr:hover { background: #F8FAFC; }
+        
+        .status-badge {
+            padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+        }
+        .status-upcoming { background: #E0F2FE; color: #0284C7; }
+        .status-completed { background: #DCFCE7; color: #16A34A; }
+        .status-pending { background: #FEF3C7; color: #D97706; }
+        .status-unread { background: #FEE2E2; color: #DC2626; }
+        .status-replied { background: #DCFCE7; color: #16A34A; }
+        .status-approved { background: #DCFCE7; color: #16A34A; }
+        
+        .action-btn-sm {
+            padding: 6px 12px; background: var(--primary); color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500;
+            transition: 0.2s;
+        }
+        .action-btn-sm:hover { opacity: 0.9; }
+        .action-btn-success { background: #10B981; }
+        .action-btn-danger { background: #EF4444; }
+
+        /* Reply Modal */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content { background: white; padding: 2rem; border-radius: var(--border-radius-md); width: 90%; max-width: 500px; }
+        
+        .message-card {
+            border: 1px solid #E2E8F0; border-radius: var(--border-radius-sm); padding: 1.5rem; margin-bottom: 1rem;
+        }
+        .message-card h4 { color: var(--primary); margin-bottom: 0.5rem; }
+        .message-card p { color: var(--text-muted); font-size: 0.95rem; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="index.html" class="brand-logo-doc">
+                <img src="./images/logo.png" alt="Logo" style="height: 30px; border-radius: 50%;">
+                Doctor Portal
+            </a>
+            <nav class="sidebar-menu">
+                <div class="sidebar-item active" data-target="panel-Appointments">
+                    <i class="fa-solid fa-calendar-check"></i> Appointments
+                </div>
+                <div class="sidebar-item" data-target="panel-Prescriptions">
+                    <i class="fa-solid fa-prescription-bottle-medical"></i> Prescriptions
+                </div>
+                <div class="sidebar-item" data-target="panel-Messages">
+                    <i class="fa-solid fa-comment-medical"></i> Messages
+                </div>
+            </nav>
+            <div style="position: absolute; bottom: 2rem; width: calc(100% - 3rem);">
+                <a href="index.html" class="sidebar-item" style="color: #FCA5A5;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Log Out
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <h1>Welcome, Dr. Oheneba!</h1>
+                    <p class="text-muted">Here are your patient requests and schedule.</p>
+                </div>
+                <div class="user-profile">
+                    <div style="text-align: right;">
+                        <span style="display: block; font-weight: 600; color: var(--primary);">Oheneba Ntim-Barimah</span>
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">Specialist</span>
+                    </div>
+                    <div class="user-avatar">ON</div>
+                </div>
+            </header>
+            
+            <!-- Appointments Panel -->
+            <div id="panel-Appointments" class="dashboard-panel">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Patient Appointments</h3>
+                        <button class="btn btn-primary" onclick="loadData()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Date & Time</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="appointmentsTableBody">
+                            <tr><td colspan="5" class="text-center">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Prescriptions Panel -->
+            <div id="panel-Prescriptions" class="dashboard-panel" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Prescription Requests</h3>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Medication</th>
+                                <th>Pharmacy</th>
+                                <th>Notes</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="prescriptionsTableBody">
+                            <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Messages Panel -->
+            <div id="panel-Messages" class="dashboard-panel" style="display:none;">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Patient Messages</h3>
+                    </div>
+                    <div id="messagesContainer">
+                        <p class="text-center">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Reply Modal -->
+    <div id="replyModal" class="modal">
+        <div class="modal-content">
+            <div class="panel-header" style="border:none; padding:0; margin-bottom: 1rem;">
+                <h3>Reply to Patient</h3>
+                <i class="fa-solid fa-times" style="cursor:pointer;" onclick="document.getElementById('replyModal').classList.remove('show')"></i>
+            </div>
+            <textarea id="replyBody" rows="5" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; margin-bottom:1rem;" placeholder="Type your reply here..."></textarea>
+            <input type="hidden" id="replyMessageId">
+            <button class="btn btn-primary w-100" onclick="submitReply()" id="replySubmitBtn">Send Reply</button>
+        </div>
+    </div>
+
+    <script src="./js/doctor-app.js"></script>
+</body>
+</html>
