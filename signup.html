@@ -101,7 +101,7 @@
                 <p class="text-muted">Join the premium telemedicine platform.</p>
             </div>
             
-            <form id="signupForm" action="dashboard.html" method="GET">
+            <form id="signupForm">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="firstName">First Name</label>
@@ -133,5 +133,40 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = 'Creating Account...';
+            btn.disabled = true;
+
+            const name = document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert('Signup failed: ' + (data.error || 'Unknown error'));
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                alert('Network error during signup.');
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>

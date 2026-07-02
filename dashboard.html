@@ -276,7 +276,7 @@
             </nav>
             
             <div style="position: absolute; bottom: 2rem; width: calc(100% - 3rem);">
-                <a href="index.html" class="sidebar-item" style="color: #EF4444;">
+                <a href="index.html" id="logoutBtn" class="sidebar-item" style="color: #EF4444;">
                     <i class="fa-solid fa-right-from-bracket"></i> Log Out
                 </a>
             </div>
@@ -286,16 +286,16 @@
         <main class="main-content">
             <header class="topbar">
                 <div>
-                    <h1 style="color: var(--primary); font-size: 2rem;">Welcome, John!</h1>
+                    <h1 id="welcomeMessage" style="color: var(--primary); font-size: 2rem;">Welcome, John!</h1>
                     <p class="text-muted">Here's your health overview for today.</p>
                 </div>
                 
                 <div class="user-profile">
                     <div style="text-align: right;">
-                        <span style="display: block; font-weight: 600; color: var(--primary);">John Doe</span>
-                        <span style="font-size: 0.85rem; color: var(--text-muted);">Patient</span>
+                        <span id="profileName" style="display: block; font-weight: 600; color: var(--primary);">John Doe</span>
+                        <span id="profileRole" style="font-size: 0.85rem; color: var(--text-muted);">Patient</span>
                     </div>
-                    <div class="user-avatar">JD</div>
+                    <div id="profileAvatar" class="user-avatar">JD</div>
                 </div>
             </header>
             
@@ -384,7 +384,7 @@
                     <div style="margin-top: 2rem;">
                         <div class="form-group">
                             <label>Full Name</label>
-                            <input type="text" value="John Doe" disabled style="background: #F1F5F9;">
+                            <input type="text" id="settingsName" value="John Doe" disabled style="background: #F1F5F9;">
                         </div>
                     </div>
                 </div>

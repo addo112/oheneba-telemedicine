@@ -12,19 +12,38 @@ const server = http.createServer(app);
 // --- NEW QUICK ACTION ENDPOINTS --- //
 
 // Handle Prescription Refill Requests
-app.post('/api/prescriptions/request', (req, res) => {
-    const { medication, pharmacy, notes } = req.body;
-    console.log(`[API] Prescription requested: ${medication} to ${pharmacy}`);
-    // In a real app, save to MongoDB
-    res.json({ success: true, message: "Prescription requested" });
+app.post('/api/prescriptions/request', async (req, res) => {
+    try {
+        const { medication, pharmacy, notes, patient } = req.body;
+        const newPrescription = new PrescriptionRequest({
+            patient: patient || "Unknown Patient",
+            medication,
+            pharmacy,
+            notes,
+            status: "Pending"
+        });
+        await newPrescription.save();
+        res.json({ success: true, message: "Prescription requested" });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to request prescription' });
+    }
 });
 
 // Handle Messaging Doctor
-app.post('/api/messages/send', (req, res) => {
-    const { subject, body } = req.body;
-    console.log(`[API] Message sent: ${subject}`);
-    // In a real app, save to MongoDB
-    res.json({ success: true, message: "Message sent" });
+app.post('/api/messages/send', async (req, res) => {
+    try {
+        const { subject, body, patient } = req.body;
+        const newMessage = new Message({
+            patient: patient || "Unknown Patient",
+            subject,
+            body,
+            status: "Unread"
+        });
+        await newMessage.save();
+        res.json({ success: true, message: "Message sent" });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to send message' });
+    }
 });
 
 // Handle Dashboard Payments
@@ -66,9 +85,78 @@ const AppointmentSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
+const PrescriptionRequestSchema = new mongoose.Schema({
+    patient: { type: String, required: true },
+    medication: { type: String, required: true },
+    pharmacy: { type: String, required: true },
+    notes: { type: String },
+    status: { type: String, default: 'Pending' },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const MessageSchema = new mongoose.Schema({
+    patient: { type: String, required: true },
+    subject: { type: String, required: true },
+    body: { type: String, required: true },
+    reply: { type: String },
+    status: { type: String, default: 'Unread' },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const UserSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role: { type: String, default: 'patient' }, // 'patient' or 'doctor'
+    createdAt: { type: Date, default: Date.now }
+});
+
 const Appointment = mongoose.model('Appointment', AppointmentSchema);
+const PrescriptionRequest = mongoose.model('PrescriptionRequest', PrescriptionRequestSchema);
+const Message = mongoose.model('Message', MessageSchema);
+const User = mongoose.model('User', UserSchema);
 
 // --- REST API ENDPOINTS ---
+
+// --- AUTH ENDPOINTS ---
+app.post('/api/auth/signup', async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+        
+        // Simple check if user exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ error: 'Email already in use' });
+        }
+
+        const newUser = new User({ name, email, password, role: 'patient' });
+        await newUser.save();
+        
+        res.status(201).json({ success: true, user: { name: newUser.name, email: newUser.email, role: newUser.role } });
+    } catch (err) {
+        res.status(500).json({ error: 'Signup failed' });
+    }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Hardcode doctor check for MVP (or check DB if doctor exists)
+        if (email === 'doctor@oheneba.com' && password === 'admin123') {
+            return res.json({ success: true, user: { name: 'Oheneba Ntim-Barimah', email: 'doctor@oheneba.com', role: 'doctor' } });
+        }
+
+        const user = await User.findOne({ email, password }); // In a real app, use bcrypt!
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        res.json({ success: true, user: { name: user.name, email: user.email, role: user.role } });
+    } catch (err) {
+        res.status(500).json({ error: 'Login failed' });
+    }
+});
 
 // Get Appointments
 app.get('/api/appointments', async (req, res) => {
@@ -92,9 +180,9 @@ app.get('/api/appointments', async (req, res) => {
 // Book Appointment
 app.post('/api/appointments/book', async (req, res) => {
     try {
-        const { doctor, date, time, type } = req.body;
+        const { doctor, date, time, type, patient } = req.body;
         const newApt = new Appointment({
-            patient: "John Doe", // Mock auth user for MVP
+            patient: patient || "Unknown Patient",
             doctor,
             date,
             time,
@@ -105,6 +193,59 @@ app.post('/api/appointments/book', async (req, res) => {
         res.status(201).json({ success: true, appointment: newApt });
     } catch (err) {
         res.status(500).json({ error: 'Failed to book appointment' });
+    }
+});
+
+// Update Appointment Status
+app.put('/api/appointments/:id', async (req, res) => {
+    try {
+        const { status } = req.body;
+        await Appointment.findByIdAndUpdate(req.params.id, { status });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to update appointment' });
+    }
+});
+
+// Get Prescriptions
+app.get('/api/prescriptions', async (req, res) => {
+    try {
+        const prescriptions = await PrescriptionRequest.find().sort({ createdAt: -1 });
+        res.json(prescriptions);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch prescriptions' });
+    }
+});
+
+// Update Prescription Status
+app.put('/api/prescriptions/:id', async (req, res) => {
+    try {
+        const { status } = req.body;
+        await PrescriptionRequest.findByIdAndUpdate(req.params.id, { status });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to update prescription' });
+    }
+});
+
+// Get Messages
+app.get('/api/messages', async (req, res) => {
+    try {
+        const messages = await Message.find().sort({ createdAt: -1 });
+        res.json(messages);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch messages' });
+    }
+});
+
+// Reply to Message
+app.put('/api/messages/:id/reply', async (req, res) => {
+    try {
+        const { reply } = req.body;
+        await Message.findByIdAndUpdate(req.params.id, { reply, status: 'Replied' });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to reply to message' });
     }
 });
 
