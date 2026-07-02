@@ -8,6 +8,33 @@ const mongoose = require('mongoose');
 
 const app = express();
 const server = http.createServer(app);
+
+// --- NEW QUICK ACTION ENDPOINTS --- //
+
+// Handle Prescription Refill Requests
+app.post('/api/prescriptions/request', (req, res) => {
+    const { medication, pharmacy, notes } = req.body;
+    console.log(`[API] Prescription requested: ${medication} to ${pharmacy}`);
+    // In a real app, save to MongoDB
+    res.json({ success: true, message: "Prescription requested" });
+});
+
+// Handle Messaging Doctor
+app.post('/api/messages/send', (req, res) => {
+    const { subject, body } = req.body;
+    console.log(`[API] Message sent: ${subject}`);
+    // In a real app, save to MongoDB
+    res.json({ success: true, message: "Message sent" });
+});
+
+// Handle Dashboard Payments
+app.post('/api/payments/dashboard', (req, res) => {
+    const { amount, method, account } = req.body;
+    console.log(`[API] Payment initiated: GHS ${amount} via ${method}`);
+    // In a real app, integrate with Paystack/Hubtel API
+    res.json({ success: true, reference: "PAY-" + Math.floor(Math.random() * 100000) });
+});
+
 const io = new Server(server, {
     cors: {
         origin: "*",
@@ -51,8 +78,8 @@ app.get('/api/appointments', async (req, res) => {
         // If DB is empty, return some default mock data for demonstration purposes
         if (appointments.length === 0) {
             return res.json([
-                { _id: '1', patient: "John Doe", doctor: "Dr. Sarah Mensah", date: "2026-07-15", time: "10:00 AM", type: "Video Call", status: "Upcoming" },
-                { _id: '2', patient: "John Doe", doctor: "Dr. Kwame Osei", date: "2026-07-22", time: "02:30 PM", type: "In-Person", status: "Upcoming" }
+                { _id: '1', patient: "John Doe", doctor: "Oheneba Ntim-Barimah", date: "2026-07-15", time: "10:00 AM", type: "Video Call", status: "Upcoming" },
+                { _id: '2', patient: "John Doe", doctor: "Oheneba Ntim-Barimah", date: "2026-07-22", time: "02:30 PM", type: "In-Person (Madina Centre)", status: "Upcoming" }
             ]);
         }
         
@@ -127,6 +154,6 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`Oheneba Center Telemedicine Server running on port ${PORT}`);
+    console.log(`Soul Health & Wellness Centre Server running on port ${PORT}`);
     console.log(`http://localhost:${PORT}`);
 });

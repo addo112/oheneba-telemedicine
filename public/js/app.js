@@ -125,9 +125,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Action buttons interaction demo & Modal logic
     const actionBtns = document.querySelectorAll('.action-btn');
+    
+    // Modals
     const bookingModal = document.getElementById('bookingModal');
+    const prescriptionModal = document.getElementById('prescriptionModal');
+    const messageModal = document.getElementById('messageModal');
+    const paymentModal = document.getElementById('paymentModal');
+    
+    // Close buttons
     const closeBookingModal = document.getElementById('closeBookingModal');
+    const closePrescriptionModal = document.getElementById('closePrescriptionModal');
+    const closeMessageModal = document.getElementById('closeMessageModal');
+    const closePaymentModal = document.getElementById('closePaymentModal');
+    
+    // Forms
     const bookingForm = document.getElementById('bookingForm');
+    const prescriptionForm = document.getElementById('prescriptionForm');
+    const messageForm = document.getElementById('messageForm');
+    const paymentForm = document.getElementById('paymentForm');
 
     if (actionBtns.length > 0) {
         actionBtns.forEach(btn => {
@@ -136,6 +151,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (actionName === 'Book New Appointment') {
                     if(bookingModal) bookingModal.classList.add('show');
+                } else if (actionName === 'Request Prescription Refill') {
+                    if(prescriptionModal) prescriptionModal.classList.add('show');
+                } else if (actionName === 'Message Your Doctor') {
+                    if(messageModal) messageModal.classList.add('show');
+                } else if (actionName === 'Make a Payment (MoMo/Card)') {
+                    if(paymentModal) paymentModal.classList.add('show');
                 } else {
                     alert(`Module in progress: ${actionName}`);
                 }
@@ -143,16 +164,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (closeBookingModal) {
-        closeBookingModal.addEventListener('click', () => {
-            bookingModal.classList.remove('show');
-        });
-    }
+    // Close Modal Logic
+    if (closeBookingModal) closeBookingModal.addEventListener('click', () => bookingModal.classList.remove('show'));
+    if (closePrescriptionModal) closePrescriptionModal.addEventListener('click', () => prescriptionModal.classList.remove('show'));
+    if (closeMessageModal) closeMessageModal.addEventListener('click', () => messageModal.classList.remove('show'));
+    if (closePaymentModal) closePaymentModal.addEventListener('click', () => paymentModal.classList.remove('show'));
 
+    // Booking Form Submit
     if (bookingForm) {
         bookingForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const submitBtn = document.getElementById('submitBookingBtn');
             submitBtn.innerText = 'Booking...';
             
@@ -167,7 +188,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ doctor, type, date, time })
                 });
-                
                 const data = await res.json();
                 if (data.success) {
                     alert("Appointment booked successfully!");
@@ -182,6 +202,101 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Error connecting to server.");
             } finally {
                 submitBtn.innerText = 'Confirm Booking';
+            }
+        });
+    }
+
+    // Prescription Form Submit
+    if (prescriptionForm) {
+        prescriptionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitPrescriptionBtn');
+            submitBtn.innerText = 'Submitting...';
+            
+            const medication = document.getElementById('medicationInput').value;
+            const pharmacy = document.getElementById('pharmacyInput').value;
+            const notes = document.getElementById('prescriptionNotes').value;
+            
+            try {
+                const res = await fetch('/api/prescriptions/request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ medication, pharmacy, notes })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert("Prescription refill requested successfully! We will notify you when it is ready.");
+                    prescriptionModal.classList.remove('show');
+                    prescriptionForm.reset();
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error connecting to server.");
+            } finally {
+                submitBtn.innerText = 'Submit Request';
+            }
+        });
+    }
+
+    // Message Form Submit
+    if (messageForm) {
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitMessageBtn');
+            submitBtn.innerText = 'Sending...';
+            
+            const subject = document.getElementById('messageSubject').value;
+            const body = document.getElementById('messageBody').value;
+            
+            try {
+                const res = await fetch('/api/messages/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ subject, body })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert("Message sent securely to Oheneba Ntim-Barimah. You will receive a reply in your dashboard soon.");
+                    messageModal.classList.remove('show');
+                    messageForm.reset();
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error connecting to server.");
+            } finally {
+                submitBtn.innerText = 'Send Message';
+            }
+        });
+    }
+
+    // Payment Form Submit
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitPaymentBtn');
+            submitBtn.innerText = 'Processing...';
+            
+            const amount = document.getElementById('paymentAmount').value;
+            const method = document.getElementById('paymentMethod').value;
+            const account = document.getElementById('paymentAccount').value;
+            
+            try {
+                const res = await fetch('/api/payments/dashboard', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount, method, account })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`Payment Initialized! Redirecting to secure checkout (Ref: ${data.reference})...`);
+                    paymentModal.classList.remove('show');
+                    paymentForm.reset();
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error connecting to server.");
+            } finally {
+                submitBtn.innerText = 'Pay Now';
             }
         });
     }
