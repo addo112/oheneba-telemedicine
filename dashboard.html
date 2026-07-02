@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Dashboard - Oheneba Center</title>
+    <title>Patient Dashboard - Soul Health & Wellness Centre</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,9 +13,8 @@
         }
         
         .dashboard-layout {
-            display: grid;
-            grid-template-columns: 260px 1fr;
             min-height: 100vh;
+            background: #F1F5F9;
         }
         
         .sidebar {
@@ -66,6 +65,13 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 3rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .topbar h1 {
+            margin: 0;
+            line-height: 1.2;
         }
         
         .user-profile {
@@ -106,11 +112,14 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
         
         .panel-header h3 {
             color: var(--primary);
             font-size: 1.3rem;
+            margin: 0;
         }
         
         .appointment-card {
@@ -192,15 +201,60 @@
             box-shadow: 0 4px 12px rgba(0, 210, 255, 0.1);
         }
         
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius-md);
+            width: 90%;
+            max-width: 500px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #E2E8F0;
+            border-radius: var(--border-radius-sm);
+        }
     </style>
 </head>
 <body>
     <div class="dashboard-layout">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <a href="index.html" class="brand-logo">
-                <i class="fa-solid fa-heart-pulse"></i>
-                Oheneba
+            <a href="index.html" class="brand-logo" style="font-size: 1rem;">
+                <img src="./images/logo.png" alt="Logo" style="height: 30px; margin-right: 10px; border-radius: 50%;">
+                Soul Health & Wellness
             </a>
             
             <nav class="sidebar-menu">
@@ -245,48 +299,205 @@
                 </div>
             </header>
             
-            <div class="dashboard-grid">
-                <!-- Left Column -->
-                <div>
-                    <div class="panel mb-4">
-                        <div class="panel-header">
-                            <h3>Upcoming Appointments</h3>
-                            <a href="#" style="color: var(--secondary); font-size: 0.9rem; font-weight: 500;">View All</a>
-                        </div>
-                        <div id="appointmentsList">
-                            <!-- Dynamically loaded appointments will appear here -->
+            <div id="panel-Overview" class="dashboard-panel active-panel">
+                <div class="dashboard-grid">
+                    <!-- Left Column -->
+                    <div>
+                        <div class="panel mb-4">
+                            <div class="panel-header">
+                                <h3>Upcoming Appointments</h3>
+                                <a href="#" id="viewAllAptBtn" style="color: var(--secondary); font-size: 0.9rem; font-weight: 500;">View All</a>
+                            </div>
+                            <div id="appointmentsList">
+                                <!-- Dynamically loaded appointments will appear here -->
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Right Column -->
-                <div>
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h3>Quick Actions</h3>
-                        </div>
-                        <div class="action-list">
-                            <div class="action-btn">
-                                <i class="fa-solid fa-plus-circle"></i>
-                                <span>Book New Appointment</span>
+                    
+                    <!-- Right Column -->
+                    <div>
+                        <div class="panel">
+                            <div class="panel-header">
+                                <h3>Quick Actions</h3>
                             </div>
-                            <div class="action-btn">
-                                <i class="fa-solid fa-prescription-bottle-medical"></i>
-                                <span>Request Prescription Refill</span>
-                            </div>
-                            <div class="action-btn">
-                                <i class="fa-solid fa-comment-medical"></i>
-                                <span>Message Your Doctor</span>
-                            </div>
-                            <div class="action-btn">
-                                <i class="fa-solid fa-file-invoice-dollar"></i>
-                                <span>Make a Payment (MoMo/Card)</span>
+                            <div class="action-list">
+                                <div class="action-btn">
+                                    <i class="fa-solid fa-plus-circle"></i>
+                                    <span>Book New Appointment</span>
+                                </div>
+                                <div class="action-btn">
+                                    <i class="fa-solid fa-prescription-bottle-medical"></i>
+                                    <span>Request Prescription Refill</span>
+                                </div>
+                                <div class="action-btn">
+                                    <i class="fa-solid fa-comment-medical"></i>
+                                    <span>Message Your Doctor</span>
+                                </div>
+                                <div class="action-btn">
+                                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                                    <span>Make a Payment (MoMo/Card)</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Other Panels (Hidden by default) -->
+            <div id="panel-Appointments" class="dashboard-panel" style="display:none;">
+                <div class="panel">
+                    <h2>Your Appointments</h2>
+                    <p class="text-muted">Manage your upcoming and past appointments here.</p>
+                    <div style="margin-top: 2rem; padding: 3rem; text-align: center; background: #F8FAFC; border-radius: 8px;">
+                        <i class="fa-solid fa-calendar-check" style="font-size: 3rem; color: #CBD5E1; margin-bottom: 1rem;"></i>
+                        <p>No past appointments found.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="panel-Medical Records" class="dashboard-panel" style="display:none;">
+                <div class="panel">
+                    <h2>Medical Records</h2>
+                    <p class="text-muted">Access your lab results, prescriptions, and visit summaries.</p>
+                    <div style="margin-top: 2rem; padding: 3rem; text-align: center; background: #F8FAFC; border-radius: 8px;">
+                        <i class="fa-solid fa-file-medical" style="font-size: 3rem; color: #CBD5E1; margin-bottom: 1rem;"></i>
+                        <p>Your medical records are up to date.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="panel-Payments" class="dashboard-panel" style="display:none;">
+                <div class="panel">
+                    <h2>Billing & Payments</h2>
+                    <p class="text-muted">View your invoices and make payments.</p>
+                    <div style="margin-top: 2rem; padding: 3rem; text-align: center; background: #F8FAFC; border-radius: 8px;">
+                        <i class="fa-solid fa-file-invoice-dollar" style="font-size: 3rem; color: #CBD5E1; margin-bottom: 1rem;"></i>
+                        <p>You have no pending invoices.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="panel-Settings" class="dashboard-panel" style="display:none;">
+                <div class="panel">
+                    <h2>Account Settings</h2>
+                    <p class="text-muted">Update your profile, password, and notifications.</p>
+                    <div style="margin-top: 2rem;">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" value="John Doe" disabled style="background: #F1F5F9;">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
+    </div>
+    
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Book New Appointment</h2>
+                <i class="fa-solid fa-times close-modal" id="closeBookingModal"></i>
+            </div>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label>Select Specialist</label>
+                    <select id="docSelect" required>
+                        <option value="Oheneba Ntim-Barimah">Oheneba Ntim-Barimah (Natural Medicine)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Consultation Type</label>
+                    <select id="typeSelect" required>
+                        <option value="Video Call">Video Call</option>
+                        <option value="In-Person (Madina Centre)">In-Person (Madina Centre)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="dateInput" required>
+                </div>
+                <div class="form-group">
+                    <label>Time</label>
+                    <input type="time" id="timeInput" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-3" id="submitBookingBtn">Confirm Booking</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Prescription Modal -->
+    <div id="prescriptionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Request Prescription Refill</h2>
+                <i class="fa-solid fa-times close-modal" id="closePrescriptionModal"></i>
+            </div>
+            <form id="prescriptionForm">
+                <div class="form-group">
+                    <label>Medication Name & Dosage</label>
+                    <input type="text" id="medicationInput" placeholder="e.g. Natural Herbal Extract 500mg" required>
+                </div>
+                <div class="form-group">
+                    <label>Preferred Pharmacy</label>
+                    <input type="text" id="pharmacyInput" placeholder="e.g. Madina Central Pharmacy" required>
+                </div>
+                <div class="form-group">
+                    <label>Additional Notes (Optional)</label>
+                    <textarea id="prescriptionNotes" rows="3" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px;" placeholder="Any specific instructions..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-3" id="submitPrescriptionBtn">Submit Request</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Message Oheneba Ntim-Barimah</h2>
+                <i class="fa-solid fa-times close-modal" id="closeMessageModal"></i>
+            </div>
+            <form id="messageForm">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" id="messageSubject" placeholder="Brief subject of your message" required>
+                </div>
+                <div class="form-group">
+                    <label>Your Message</label>
+                    <textarea id="messageBody" rows="5" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px;" placeholder="Type your message here..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-3" id="submitMessageBtn">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Make a Payment</h2>
+                <i class="fa-solid fa-times close-modal" id="closePaymentModal"></i>
+            </div>
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label>Amount (GHS)</label>
+                    <input type="number" id="paymentAmount" value="250" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <select id="paymentMethod" required>
+                        <option value="momo">Mobile Money (MoMo)</option>
+                        <option value="card">Credit / Debit Card</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Account / Phone Number</label>
+                    <input type="text" id="paymentAccount" placeholder="e.g. 024 XXX XXXX" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-3" id="submitPaymentBtn">Pay Now</button>
+            </form>
+        </div>
     </div>
     
     <!-- Socket.io and App Scripts -->
