@@ -126,23 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Call End Button Demo
-    const endCallBtn = document.querySelector('.end-call');
-    const videoStatus = document.querySelector('.video-placeholder span');
-    
-    if (endCallBtn) {
-        endCallBtn.addEventListener('click', () => {
-            if (peerConnection) {
-                peerConnection.close();
-            }
-            if (socket) {
-                socket.disconnect();
-            }
-            videoStatus.innerText = 'Call Ended.';
-            document.querySelector('.status.online').style.display = 'none';
-        });
-    }
-
     // Load Appointments on Dashboard
     if (window.location.pathname.includes('dashboard.html') || window.location.pathname.includes('dashboard')) {
         loadAppointments();
