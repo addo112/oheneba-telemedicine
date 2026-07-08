@@ -14,59 +14,15 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- MONGODB CONNECTION ---
-// We will use process.env.MONGODB_URI. If not provided, we will just log a warning and not crash immediately.
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log('Connected to MongoDB database successfully!');
-}).catch((err) => {
-    console.error('Failed to connect to MongoDB. Have you set MONGODB_URI?');
-    console.error(err.message);
-});
+// --- MOCK DATABASE (In-Memory for MVP Prototype) ---
+// We are using this so the app works instantly on Render without needing MongoDB Atlas configured!
 
-// --- MONGOOSE SCHEMAS ---
-
-const UserSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    role: { type: String, default: 'patient' },
-    createdAt: { type: Date, default: Date.now }
-});
-const User = mongoose.model('User', UserSchema);
-
-const AppointmentSchema = new mongoose.Schema({
-    patient: { type: String, required: true },
-    doctor: { type: String, required: true },
-    date: { type: String, required: true },
-    time: { type: String, required: true },
-    type: { type: String, required: true },
-    status: { type: String, default: 'Upcoming' },
-    createdAt: { type: Date, default: Date.now }
-});
-const Appointment = mongoose.model('Appointment', AppointmentSchema);
-
-const PrescriptionSchema = new mongoose.Schema({
-    patient: { type: String, required: true },
-    medication: { type: String, required: true },
-    pharmacy: { type: String, required: true },
-    notes: { type: String, default: '' },
-    status: { type: String, default: 'Pending' },
-    createdAt: { type: Date, default: Date.now }
-});
-const Prescription = mongoose.model('Prescription', PrescriptionSchema);
-
-const MessageSchema = new mongoose.Schema({
-    patient: { type: String, required: true },
-    subject: { type: String, required: true },
-    body: { type: String, required: true },
-    reply: { type: String, default: '' },
-    status: { type: String, default: 'Unread' },
-    createdAt: { type: Date, default: Date.now }
-});
-const Message = mongoose.model('Message', MessageSchema);
+const db = {
+    users: [],
+    appointments: [],
+    prescriptions: [],
+    messages: []
+};
 
 
 // --- REST API ENDPOINTS ---
@@ -76,18 +32,17 @@ app.post('/api/auth/signup', async (req, res) => {
     try {
         const { name, email, password } = req.body;
         
-        const existingUser = await User.findOne({ email });
+        const existingUser = db.users.find(u => u.email === email);
         if (existingUser) {
             return res.status(400).json({ error: 'Email already in use' });
         }
 
-        const newUser = new User({ name, email, password, role: 'patient' });
-        await newUser.save();
+        const newUser = { _id: Date.now().toString(), name, email, password, role: 'patient', createdAt: new Date() };
+        db.users.push(newUser);
         
         res.status(201).json({ success: true, user: { name: newUser.name, email: newUser.email, role: newUser.role } });
     } catch (err) {
-        console.error("Signup error:", err);
-        res.status(500).json({ error: 'Signup failed. Check database connection.' });
+        res.status(500).json({ error: 'Signup failed.' });
     }
 });
 
@@ -101,22 +56,21 @@ app.post('/api/auth/login', async (req, res) => {
             return res.json({ success: true, user: { name: 'Oheneba Ntim-Barimah', email: 'doctor@oheneba.com', role: 'doctor' } });
         }
 
-        const user = await User.findOne({ email, password });
+        const user = db.users.find(u => u.email === email && u.password === password);
         if (!user) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
         res.json({ success: true, user: { name: user.name, email: user.email, role: user.role } });
     } catch (err) {
-        console.error("Login error:", err);
-        res.status(500).json({ error: 'Login failed. Check database connection.' });
+        res.status(500).json({ error: 'Login failed.' });
     }
 });
 
 // APPOINTMENTS: Get All
 app.get('/api/appointments', async (req, res) => {
     try {
-        const appointments = await Appointment.find().sort({ createdAt: -1 });
+        const appointments = [...db.appointments].sort((a, b) => b.createdAt - a.createdAt);
         res.json(appointments);
     } catch (err) {
         res.status(500).json({ error: 'Failed to fetch appointments' });
@@ -127,14 +81,17 @@ app.get('/api/appointments', async (req, res) => {
 app.post('/api/appointments/book', async (req, res) => {
     try {
         const { doctor, date, time, type, patient } = req.body;
-        const newApt = new Appointment({
+        const newApt = {
+            _id: Date.now().toString(),
             patient: patient || "Unknown Patient",
             doctor,
             date,
             time,
-            type
-        });
-        await newApt.save();
+            type,
+            status: 'Upcoming',
+            createdAt: new Date()
+        };
+        db.appointments.push(newApt);
         res.status(201).json({ success: true, appointment: newApt });
     } catch (err) {
         res.status(500).json({ error: 'Failed to book appointment' });
@@ -145,7 +102,8 @@ app.post('/api/appointments/book', async (req, res) => {
 app.put('/api/appointments/:id', async (req, res) => {
     try {
         const { status } = req.body;
-        await Appointment.findByIdAndUpdate(req.params.id, { status });
+        const apt = db.appointments.find(a => a._id === req.params.id);
+        if (apt) apt.status = status;
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: 'Failed to update appointment' });
@@ -155,7 +113,7 @@ app.put('/api/appointments/:id', async (req, res) => {
 // PRESCRIPTIONS: Get All
 app.get('/api/prescriptions', async (req, res) => {
     try {
-        const prescriptions = await Prescription.find().sort({ createdAt: -1 });
+        const prescriptions = [...db.prescriptions].sort((a, b) => b.createdAt - a.createdAt);
         res.json(prescriptions);
     } catch (err) {
         res.status(500).json({ error: 'Failed to fetch prescriptions' });
@@ -166,13 +124,16 @@ app.get('/api/prescriptions', async (req, res) => {
 app.post('/api/prescriptions/request', async (req, res) => {
     try {
         const { medication, pharmacy, notes, patient } = req.body;
-        const newPrescription = new Prescription({
+        const newPrescription = {
+            _id: Date.now().toString(),
             patient: patient || "Unknown Patient",
             medication,
             pharmacy,
-            notes
-        });
-        await newPrescription.save();
+            notes,
+            status: 'Pending',
+            createdAt: new Date()
+        };
+        db.prescriptions.push(newPrescription);
         res.json({ success: true, message: "Prescription requested" });
     } catch (err) {
         res.status(500).json({ error: 'Failed to request prescription' });
@@ -183,7 +144,8 @@ app.post('/api/prescriptions/request', async (req, res) => {
 app.put('/api/prescriptions/:id', async (req, res) => {
     try {
         const { status } = req.body;
-        await Prescription.findByIdAndUpdate(req.params.id, { status });
+        const reqItem = db.prescriptions.find(p => p._id === req.params.id);
+        if (reqItem) reqItem.status = status;
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: 'Failed to update prescription' });
@@ -193,7 +155,7 @@ app.put('/api/prescriptions/:id', async (req, res) => {
 // MESSAGES: Get All
 app.get('/api/messages', async (req, res) => {
     try {
-        const messages = await Message.find().sort({ createdAt: -1 });
+        const messages = [...db.messages].sort((a, b) => b.createdAt - a.createdAt);
         res.json(messages);
     } catch (err) {
         res.status(500).json({ error: 'Failed to fetch messages' });
@@ -204,12 +166,16 @@ app.get('/api/messages', async (req, res) => {
 app.post('/api/messages/send', async (req, res) => {
     try {
         const { subject, body, patient } = req.body;
-        const newMessage = new Message({
+        const newMessage = {
+            _id: Date.now().toString(),
             patient: patient || "Unknown Patient",
             subject,
-            body
-        });
-        await newMessage.save();
+            body,
+            reply: '',
+            status: 'Unread',
+            createdAt: new Date()
+        };
+        db.messages.push(newMessage);
         res.json({ success: true, message: "Message sent" });
     } catch (err) {
         res.status(500).json({ error: 'Failed to send message' });
@@ -220,10 +186,11 @@ app.post('/api/messages/send', async (req, res) => {
 app.put('/api/messages/:id/reply', async (req, res) => {
     try {
         const { reply } = req.body;
-        await Message.findByIdAndUpdate(req.params.id, {
-            reply: reply,
-            status: 'Replied'
-        });
+        const msg = db.messages.find(m => m._id === req.params.id);
+        if (msg) {
+            msg.reply = reply;
+            msg.status = 'Replied';
+        }
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: 'Failed to reply to message' });
