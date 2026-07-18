@@ -36,27 +36,31 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Dynamic UI Updates for logged-in user
     if (currentUser && !isPublicPage) {
-        const welcomeMessage = document.getElementById('welcomeMessage');
-        const profileName = document.getElementById('profileName');
-        const profileRole = document.getElementById('profileRole');
-        const profileAvatar = document.getElementById('profileAvatar');
-        const settingsName = document.getElementById('settingsName');
-        
-        if (welcomeMessage) {
-            welcomeMessage.innerText = `Welcome, ${currentUser.name.split(' ')[0]}!`;
-        }
-        if (profileName) {
-            profileName.innerText = currentUser.name;
-        }
-        if (profileRole) {
-            profileRole.innerText = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1);
-        }
-        if (profileAvatar) {
-            const initials = currentUser.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
-            profileAvatar.innerText = initials;
-        }
-        if (settingsName) {
-            settingsName.value = currentUser.name;
+        try {
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            const profileName = document.getElementById('profileName');
+            const profileRole = document.getElementById('profileRole');
+            const profileAvatar = document.getElementById('profileAvatar');
+            const settingsName = document.getElementById('settingsName');
+            
+            if (welcomeMessage && currentUser.name) {
+                welcomeMessage.innerText = `Welcome, ${currentUser.name.split(' ')[0]}!`;
+            }
+            if (profileName && currentUser.name) {
+                profileName.innerText = currentUser.name;
+            }
+            if (profileRole && currentUser.role) {
+                profileRole.innerText = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1);
+            }
+            if (profileAvatar && currentUser.name) {
+                const initials = currentUser.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+                profileAvatar.innerText = initials;
+            }
+            if (settingsName && currentUser.name) {
+                settingsName.value = currentUser.name;
+            }
+        } catch (err) {
+            console.error("Error updating user UI:", err);
         }
     }
     // --- END AUTH CHECK ---
