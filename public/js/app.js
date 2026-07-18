@@ -199,7 +199,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (actionBtns.length > 0) {
         actionBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                const actionName = btn.querySelector('span').innerText;
+                const spanEl = btn.querySelector('span');
+                if (!spanEl) return;
+                const actionName = spanEl.innerText.trim();
                 
                 if (actionName === 'Book New Appointment') {
                     if(bookingModal) bookingModal.classList.add('show');
