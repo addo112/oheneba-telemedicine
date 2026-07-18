@@ -46,7 +46,7 @@ async function loadAppointments() {
                 <td><span class="status-badge ${apt.status === 'Completed' ? 'status-completed' : 'status-upcoming'}">${apt.status}</span></td>
                 <td>
                     ${apt.status !== 'Completed' ? `<button class="action-btn-sm action-btn-success" onclick="completeAppointment('${apt._id}')">Mark Completed</button>` : '<em>Done</em>'}
-                    ${apt.type === 'Video Call' && apt.status !== 'Completed' ? `<button class="action-btn-sm" style="background:#3B82F6; margin-left:5px;" onclick="alert('In a real app, this launches the WebRTC Video Call room.')">Join Video</button>` : ''}
+                    ${apt.type === 'Video Call' && apt.status !== 'Completed' ? `<button class="action-btn-sm" style="background:#3B82F6; margin-left:5px;" onclick="joinVideoCall('${apt._id}', 'doctor')">Join Video</button>` : ''}
                 </td>
             </tr>
         `).join('');

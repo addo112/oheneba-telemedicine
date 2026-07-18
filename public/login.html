@@ -96,7 +96,7 @@
                 <p class="text-muted">Log in to manage your appointments.</p>
             </div>
             
-            <form id="loginForm" action="dashboard.html" method="GET">
+            <form id="loginForm">
                 <div class="form-group">
                     <label for="email">Email or Phone Number</label>
                     <input type="text" id="email" class="form-control" placeholder="Enter your email or phone" required>
@@ -121,5 +121,44 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = 'Logging In...';
+            btn.disabled = true;
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    // Redirect based on role
+                    if (data.user.role === 'doctor') {
+                        window.location.href = 'doctor-dashboard.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                } else {
+                    alert('Login failed: ' + (data.error || 'Invalid credentials'));
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                alert('Network error during login.');
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>

@@ -15,6 +15,62 @@ const servers = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    // --- AUTHENTICATION CHECK ---
+    const isPublicPage = window.location.pathname.includes('index.html') || window.location.pathname.includes('login.html') || window.location.pathname.includes('signup.html') || window.location.pathname === '/' || window.location.pathname === '';
+    
+    const userData = localStorage.getItem('user');
+    let currentUser = null;
+    
+    if (userData) {
+        try {
+            currentUser = JSON.parse(userData);
+        } catch (e) {
+            console.error("Invalid user data");
+        }
+    }
+
+    if (!currentUser && !isPublicPage) {
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    // Dynamic UI Updates for logged-in user
+    if (currentUser && !isPublicPage) {
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const profileName = document.getElementById('profileName');
+        const profileRole = document.getElementById('profileRole');
+        const profileAvatar = document.getElementById('profileAvatar');
+        const settingsName = document.getElementById('settingsName');
+        
+        if (welcomeMessage) {
+            welcomeMessage.innerText = `Welcome, ${currentUser.name.split(' ')[0]}!`;
+        }
+        if (profileName) {
+            profileName.innerText = currentUser.name;
+        }
+        if (profileRole) {
+            profileRole.innerText = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1);
+        }
+        if (profileAvatar) {
+            const initials = currentUser.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+            profileAvatar.innerText = initials;
+        }
+        if (settingsName) {
+            settingsName.value = currentUser.name;
+        }
+    }
+    // --- END AUTH CHECK ---
+
+    // Logout Logic
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        });
+    }
+
     // Navbar Scroll Effect
     const navbar = document.querySelector('.navbar');
     if (navbar) {
@@ -67,23 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Error connecting to payment gateway.");
                 payBtn.innerText = 'Pay Now';
             }
-        });
-    }
-
-    // Call End Button Demo
-    const endCallBtn = document.querySelector('.end-call');
-    const videoStatus = document.querySelector('.video-placeholder span');
-    
-    if (endCallBtn) {
-        endCallBtn.addEventListener('click', () => {
-            if (peerConnection) {
-                peerConnection.close();
-            }
-            if (socket) {
-                socket.disconnect();
-            }
-            videoStatus.innerText = 'Call Ended.';
-            document.querySelector('.status.online').style.display = 'none';
         });
     }
 
@@ -183,6 +222,50 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeMessageModal) closeMessageModal.addEventListener('click', () => messageModal.classList.remove('show'));
     if (closePaymentModal) closePaymentModal.addEventListener('click', () => paymentModal.classList.remove('show'));
 
+    // --- CUSTOM TOAST NOTIFICATION ---
+    window.showToast = function(message, type = 'success') {
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            toastContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;';
+            document.body.appendChild(toastContainer);
+        }
+
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            background: ${type === 'success' ? '#10B981' : '#EF4444'};
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        `;
+        
+        toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i> ${message}`;
+        toastContainer.appendChild(toast);
+
+        // Animate in
+        setTimeout(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+        }, 10);
+
+        // Animate out and remove
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-20px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    };
+    // --- END TOAST NOTIFICATION ---
+
     // Booking Form Submit
     if (bookingForm) {
         bookingForm.addEventListener('submit', async (e) => {
@@ -199,20 +282,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = await fetch('/api/appointments/book', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ doctor, type, date, time })
+                    body: JSON.stringify({ doctor, type, date, time, patient: currentUser.name })
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert("Appointment booked successfully!");
+                    showToast("Appointment booked successfully!");
                     bookingModal.classList.remove('show');
                     bookingForm.reset();
                     loadAppointments(); // Reload list
                 } else {
-                    alert("Failed to book appointment.");
+                    showToast("Failed to book appointment.", "error");
                 }
             } catch (err) {
                 console.error(err);
-                alert("Error connecting to server.");
+                showToast("Error connecting to server.", "error");
             } finally {
                 submitBtn.innerText = 'Confirm Booking';
             }
@@ -234,17 +317,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = await fetch('/api/prescriptions/request', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ medication, pharmacy, notes })
+                    body: JSON.stringify({ medication, pharmacy, notes, patient: currentUser.name })
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert("Prescription refill requested successfully! We will notify you when it is ready.");
+                    showToast("Prescription refill requested successfully! We will notify you when it is ready.");
                     prescriptionModal.classList.remove('show');
                     prescriptionForm.reset();
                 }
             } catch (err) {
                 console.error(err);
-                alert("Error connecting to server.");
+                showToast("Error connecting to server.", "error");
             } finally {
                 submitBtn.innerText = 'Submit Request';
             }
@@ -265,17 +348,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = await fetch('/api/messages/send', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ subject, body })
+                    body: JSON.stringify({ subject, body, patient: currentUser.name })
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert("Message sent securely to Oheneba Ntim-Barimah. You will receive a reply in your dashboard soon.");
+                    showToast("Message sent securely to Oheneba Ntim-Barimah. You will receive a reply in your dashboard soon.");
                     messageModal.classList.remove('show');
                     messageForm.reset();
                 }
             } catch (err) {
                 console.error(err);
-                alert("Error connecting to server.");
+                showToast("Error connecting to server.", "error");
             } finally {
                 submitBtn.innerText = 'Send Message';
             }
@@ -301,13 +384,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert(`Payment Initialized! Redirecting to secure checkout (Ref: ${data.reference})...`);
+                    showToast(`Payment Initialized! Redirecting to secure checkout (Ref: ${data.reference})...`);
                     paymentModal.classList.remove('show');
                     paymentForm.reset();
                 }
             } catch (err) {
                 console.error(err);
-                alert("Error connecting to server.");
+                showToast("Error connecting to server.", "error");
             } finally {
                 submitBtn.innerText = 'Pay Now';
             }
@@ -342,7 +425,7 @@ async function loadAppointments() {
                         </div>
                     </div>
                     ${apt.type === 'Video Call' ? 
-                        `<button class="btn btn-primary" onclick="joinVideoCall()"><i class="fa-solid fa-video"></i> Join</button>` : 
+                        `<button class="btn btn-primary" onclick="joinVideoCall('${apt._id}', 'patient')"><i class="fa-solid fa-video"></i> Join</button>` : 
                         `<button class="btn btn-outline">Details</button>`}
                 </div>
                 `;
@@ -350,26 +433,5 @@ async function loadAppointments() {
         }
     } catch (error) {
         console.error("Error fetching appointments:", error);
-    }
-}
-
-// Socket.io + WebRTC logic for Video Calling
-async function joinVideoCall() {
-    const videoStatus = document.querySelector('.video-placeholder span');
-    if (videoStatus) videoStatus.innerText = 'Requesting Camera...';
-    
-    alert("In a real environment, this would request your camera and connect to the doctor via Socket.io & WebRTC!");
-    
-    // Check if io is defined (needs script tag in html)
-    if (typeof io !== 'undefined') {
-        socket = io('/');
-        
-        const userId = 'patient-' + Math.floor(Math.random() * 1000);
-        socket.emit('join-room', roomId, userId);
-        
-        socket.on('user-connected', (id) => {
-            console.log('User connected: ' + id);
-            // In a real app, we would initiate WebRTC offer here
-        });
     }
 }
