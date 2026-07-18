@@ -1,18 +1,6 @@
-// Socket.io Integration for Real-Time Video
-let socket;
-let localStream;
-let remoteStream;
-let peerConnection;
-const roomId = 'room-123'; // Static room for MVP
+// app.js — Patient Dashboard Logic
+// (WebRTC variables and STUN servers are defined in webrtc.js)
 
-// WebRTC STUN Servers
-const servers = {
-    iceServers: [
-        {
-            urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302']
-        }
-    ]
-};
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- AUTHENTICATION CHECK ---
