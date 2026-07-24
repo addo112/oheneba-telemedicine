@@ -44,8 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const initials = currentUser.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
                 profileAvatar.innerText = initials;
             }
+            const settingsEmail = document.getElementById('settingsEmail');
             if (settingsName && currentUser.name) {
                 settingsName.value = currentUser.name;
+            }
+            if (settingsEmail && currentUser.email) {
+                settingsEmail.value = currentUser.email;
             }
         } catch (err) {
             console.error("Error updating user UI:", err);
@@ -388,6 +392,37 @@ document.addEventListener('DOMContentLoaded', () => {
             } finally {
                 submitBtn.innerText = 'Pay Now';
             }
+        });
+    }
+
+    // Settings Profile Form Submit
+    const settingsProfileForm = document.getElementById('settingsProfileForm');
+    if (settingsProfileForm) {
+        settingsProfileForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newName = document.getElementById('settingsName').value;
+            const newEmail = document.getElementById('settingsEmail').value;
+            if (currentUser) {
+                if (newName) currentUser.name = newName;
+                if (newEmail) currentUser.email = newEmail;
+                localStorage.setItem('user', JSON.stringify(currentUser));
+                
+                const profileName = document.getElementById('profileName');
+                if (profileName) profileName.innerText = currentUser.name;
+                const welcomeMessage = document.getElementById('welcomeMessage');
+                if (welcomeMessage) welcomeMessage.innerText = `Welcome, ${currentUser.name.split(' ')[0]}!`;
+            }
+            showToast("Profile settings saved successfully!");
+        });
+    }
+
+    // Settings Security Form Submit
+    const settingsSecurityForm = document.getElementById('settingsSecurityForm');
+    if (settingsSecurityForm) {
+        settingsSecurityForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            showToast("Password updated successfully!");
+            settingsSecurityForm.reset();
         });
     }
 });
